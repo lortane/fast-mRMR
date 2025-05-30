@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "debug build all",
+      "type": "shell",
+      "command": "cmd.exe",
+      "args": ["/c", "xmake f -m debug -y && xmake build --all"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
