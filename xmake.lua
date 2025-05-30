@@ -18,6 +18,8 @@ set_default("mode", "release")
 -- Set warnings
 set_warnings("allextra", "error")
 
+add_requires("vcpkg::arrow[parquet,csv]", {configs = {shared = true}, alias = "arrow"})
+
 -- Define the fast-mrmr_core core library
 target("fast-mrmr_core")
     set_kind("static")
@@ -29,8 +31,9 @@ target("fast-mrmr_cli")
     set_kind("binary")
     add_deps("fast-mrmr_core")
     add_files("apps/fast-mrmr_cli.cpp")
+    add_packages("arrow")
 
-target("data_reader")
+target("csv_to_parquet")
     set_kind("binary")
-    add_files("apps/data_reader.cpp")
-    add_deps("fast-mrmr_core")
+    add_files("apps/csv_to_parquet.cpp")
+    add_packages("arrow")
