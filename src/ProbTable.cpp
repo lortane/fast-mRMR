@@ -1,0 +1,77 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "ProbTable.h"
+
+#include <stdexcept>
+
+#include "Histogram.h"
+
+ProbTable::ProbTable(RawData& rd)
+    : rawData(rd)
+{
+    this->datasize = rawData.getDataSize();
+    this->featuresSize = rawData.getFeaturesSize();
+    this->valuesRange = rawData.getValuesRangeArray();
+
+    // Initialize table with the right dimensions
+    table.resize(featuresSize);
+
+    // Calculate probabilities immediately
+    calculate();
+}
+
+// Calculates the marginal probability table for each possible value in a feature.
+// This table is cached in memory to avoid repeating calculations.
+void ProbTable::calculate()
+{
+    Histogram histogram(rawData);
+
+    for (uint i = 0; i < featuresSize; ++i) {
+        // Get histogram for this feature
+        std::vector<uint> hist_data = histogram.getHistogram(i);
+
+        // Resize the inner vector for this feature
+        table[i].resize(valuesRange[i]);
+
+        // Calculate and store probabilities
+        for (uint j = 0; j < valuesRange[i]; ++j) {
+            table[i][j] = static_cast<t_prob>(hist_data[j]) / static_cast<t_prob>(datasize);
+        }
+    }
+}
+
+/**
+ * Get probability for a specific feature and value
+ *
+ * @param index The index of the feature
+ * @param value The value to get the probability for
+ * @return The probability value
+ */
+double ProbTable::getProbability(uint index, t_data value)
+{
+    // Add bounds checking
+    if (index >= table.size()) {
+        throw std::out_of_range("Feature index out of range in getProbability");
+    }
+
+    if (value >= table[index].size()) {
+        throw std::out_of_range("Value out of range in getProbability");
+    }
+
+    return table[index][value];
+}

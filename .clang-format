@@ -1,0 +1,12 @@
+BasedOnStyle: Google
+AccessModifierOffset: -2
+AlignOperands: Align
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+BinPackArguments: false
+BreakBeforeBraces: Linux
+BreakBeforeBinaryOperators: NonAssignment
+ColumnLimit: 100
+IndentWidth: 4
+PackConstructorInitializers: Never
+PenaltyBreakAssignment: 50
