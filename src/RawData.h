@@ -20,30 +20,27 @@
 #include <fstream>
 #include <vector>
 
-#include "utils.h"
-
 class RawData
 {
   public:
-    explicit RawData(const std::string &filename);
+    explicit RawData(const std::string& filename);
     ~RawData();
 
-    uint getValuesRange(uint index) const;
-    std::vector<uint> getValuesRangeArray() const;
-    uint getDataSize() const;
-    uint getFeaturesSize() const;
+    std::uint32_t getValuesRange(std::uint32_t index) const;
+    const std::vector<std::uint32_t>& getValuesRangeArray() const;
+    std::uint32_t getDataSize() const;
+    std::uint32_t getFeaturesSize() const;
 
-    // Return a span or vector reference rather than raw pointer
-    std::vector<t_data> getFeature(int index) const;
+    std::vector<std::uint8_t> fetchFeature(std::uint32_t index) const;
 
   private:
     void calculateVR();
     void calculateDSandFS();
     void loadData();
 
-    std::vector<t_data> data_;
-    uint features_size_;
-    uint data_size_;
-    std::vector<uint> values_range_;
+    std::vector<std::uint8_t> data_;
+    std::uint32_t features_size_;
+    std::uint32_t data_size_;
+    std::vector<std::uint32_t> values_range_;
     std::ifstream data_file_;
 };

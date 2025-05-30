@@ -24,9 +24,9 @@ class MutualInfo
   public:
     MutualInfo(RawData &rd, ProbTable &pt);
 
-    t_prob get(uint index1, uint index2);
+    double fetch(std::uint32_t index1, std::uint32_t index2) const;
 
   private:
     RawData &raw_data_;
-    ProbTable prob_table_;
+    ProbTable &prob_table_;
 };

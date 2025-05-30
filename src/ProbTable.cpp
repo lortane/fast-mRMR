@@ -22,14 +22,14 @@
 #include "Histogram.h"
 
 ProbTable::ProbTable(RawData& rd)
-    : raw_data(rd)
+    : raw_data_(rd)
 {
-    data_size_ = raw_data.getDataSize();
-    features_size_ = raw_data.getFeaturesSize();
-    values_range_ = raw_data.getValuesRangeArray();
+    data_size_ = raw_data_.getDataSize();
+    features_size_ = raw_data_.getFeaturesSize();
+    values_range_ = raw_data_.getValuesRangeArray();
 
     // Initialize table with the right dimensions
-    table.resize(features_size_);
+    table_.resize(features_size_);
 
     // Calculate probabilities immediately
     calculate();
@@ -39,18 +39,18 @@ ProbTable::ProbTable(RawData& rd)
 // This table is cached in memory to avoid repeating calculations.
 void ProbTable::calculate()
 {
-    Histogram histogram(raw_data);
+    Histogram histogram(raw_data_);
 
-    for (uint i = 0; i < features_size_; ++i) {
+    for (std::uint32_t i = 0; i < features_size_; ++i) {
         // Get histogram for this feature
-        std::vector<uint> hist_data = histogram.getHistogram(i);
+        std::vector<std::uint32_t> hist_data = histogram.getHistogram(i);
 
         // Resize the inner vector for this feature
-        table[i].resize(values_range_[i]);
+        table_[i].resize(values_range_[i]);
 
         // Calculate and store probabilities
-        for (uint j = 0; j < values_range_[i]; ++j) {
-            table[i][j] = static_cast<t_prob>(hist_data[j]) / static_cast<t_prob>(data_size_);
+        for (std::uint32_t j = 0; j < values_range_[i]; ++j) {
+            table_[i][j] = static_cast<double>(hist_data[j]) / static_cast<double>(data_size_);
         }
     }
 }
@@ -62,16 +62,16 @@ void ProbTable::calculate()
  * @param value The value to get the probability for
  * @return The probability value
  */
-double ProbTable::getProbability(uint index, t_data value)
+double ProbTable::fetchProbability(std::uint32_t index, std::uint8_t value) const
 {
     // Add bounds checking
-    if (index >= table.size()) {
-        throw std::out_of_range("Feature index out of range in getProbability");
+    if (index >= table_.size()) {
+        throw std::out_of_range("Feature index out of range in fetchProbability");
     }
 
-    if (value >= table[index].size()) {
-        throw std::out_of_range("Value out of range in getProbability");
+    if (value >= table_[index].size()) {
+        throw std::out_of_range("Value out of range in fetchProbability");
     }
 
-    return table[index][value];
+    return table_[index][value];
 }

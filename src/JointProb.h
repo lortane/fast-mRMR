@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <stdfloat>
 #include <vector>
 
 #include "RawData.h"
@@ -24,17 +25,18 @@
 class JointProb
 {
   public:
-    JointProb(RawData &rd, uint index1, uint index2);
+    JointProb(RawData &rd, std::uint32_t index1, std::uint32_t index2);
 
-    void calculate();
-    t_prob getProb(t_data valueFeature1, t_data valueFeature2);
+    double fetchProbability(std::uint8_t value_feature1, std::uint8_t value_feature2) const;
 
   private:
     RawData &raw_data_;
-    std::vector<uint> data_;
-    uint data_size_;
-    uint values_range1_;
-    uint values_range2_;
-    uint index1_;
-    uint index2_;
+    std::uint32_t index1_;
+    std::uint32_t index2_;
+    std::vector<std::uint32_t> data_;
+    std::uint32_t values_range1_;
+    std::uint32_t values_range2_;
+    std::uint32_t data_size_;
+
+    void calculate();
 };

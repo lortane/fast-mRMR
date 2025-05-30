@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "StringTokenizer.h"
-#include "utils.h"
 
 typedef unsigned char byte;
 
@@ -55,11 +54,11 @@ bool contains(std::string key, std::map<std::string, byte> mymap)
  */
 int main(int argc, char* argv[])
 {
-    uint datasize = 0;
-    uint featuresSize = 0;
-    uint featurePos = 0;
-    uint i = 0;
-    uint limitMod16;
+    std::uint32_t datasize = 0;
+    std::uint32_t featuresSize = 0;
+    std::uint32_t featurePos = 0;
+    std::uint32_t i = 0;
+    std::uint32_t limitMod16;
     std::string line;
     std::string token;
     byte data;
@@ -111,7 +110,7 @@ int main(int argc, char* argv[])
 
         // Ignore first line (headers from csv) again.
         getline(inputFile, line);
-        uint lineCount = 0;
+        std::uint32_t lineCount = 0;
         // Read and translate file to binary.
         while (getline(inputFile, line)) {
             if (lineCount % 100000 == 0) {

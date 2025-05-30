@@ -19,8 +19,6 @@
 
 #include <vector>
 
-#include "utils.h"
-
 class RawData;
 
 class ProbTable
@@ -29,14 +27,14 @@ class ProbTable
     explicit ProbTable(RawData& rd);
 
     void calculate();
-    t_prob getProbability(uint feature, t_data value);
+    double fetchProbability(std::uint32_t feature, std::uint8_t value) const;
 
   private:
-    RawData& raw_data;
+    RawData& raw_data_;
 
-    std::vector<std::vector<t_prob>> table;
+    std::vector<std::vector<double>> table_;
 
-    std::vector<uint> values_range_;
-    uint features_size_;
-    uint data_size_;
+    std::vector<std::uint32_t> values_range_;
+    std::uint32_t features_size_;
+    std::uint32_t data_size_;
 };

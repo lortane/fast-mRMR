@@ -27,14 +27,13 @@
 
 #include "MutualInfo.h"
 #include "RawData.h"
-#include "utils.h"
 
 // Returns the index of the higher value in the classRelevances Vector different
 // from classIndex
-uint getMaxRelevance(std::vector<double> classRelevances, uint classIndex)
+std::uint32_t getMaxRelevance(std::vector<double> classRelevances, std::uint32_t classIndex)
 {
-    uint i = 0;
-    uint newFeature = -1;
+    std::uint32_t i = 0;
+    std::uint32_t newFeature = -1;
     double relevance = 0;
     for (i = 0; i < classRelevances.size(); ++i) {
         if (classRelevances[i] > relevance && i != classIndex) {
@@ -44,6 +43,12 @@ uint getMaxRelevance(std::vector<double> classRelevances, uint classIndex)
     }
     return newFeature;
 }
+
+typedef struct options {
+    std::uint32_t classIndex;
+    std::uint32_t selectedFeatures;
+    std::string file;
+} options;
 
 options parseOptions(int argc, char *argv[])
 {
@@ -80,10 +85,10 @@ options parseOptions(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
     options opts;
-    uint i = 0;
-    uint j = 0;
-    uint newFeatureIndex = 0;
-    uint lastFeatureIndex = 0;
+    std::uint32_t i = 0;
+    std::uint32_t j = 0;
+    std::uint32_t newFeatureIndex = 0;
+    std::uint32_t lastFeatureIndex = 0;
     double mrmr = 0;
     double best_score = 0;
     std::vector<double> relevances;
@@ -100,7 +105,7 @@ int main(int argc, char *argv[])
 
     // Get relevances between all features and class.
     for (i = 0; i < rawData.getFeaturesSize(); ++i) {
-        relevances.push_back(mutualInfo.get(opts.classIndex, i));
+        relevances.push_back(mutualInfo.fetch(opts.classIndex, i));
         redundances.push_back(0);
     }
 
@@ -118,7 +123,7 @@ int main(int argc, char *argv[])
             // If feature not in selected selectedFeatures
             if (find(selectedFeatures.begin(), selectedFeatures.end(), j) == selectedFeatures.end()
                 && j != opts.classIndex) {
-                redundances[j] += mutualInfo.get(lastFeatureIndex, j);
+                redundances[j] += mutualInfo.fetch(lastFeatureIndex, j);
                 mrmr = relevances[j] - (redundances[j] / selectedFeatures.size());
                 if (mrmr > best_score) {
                     best_score = mrmr;

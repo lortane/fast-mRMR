@@ -24,9 +24,9 @@
 class Histogram
 {
   public:
-    Histogram(RawData &rd);
+    Histogram(RawData &rd) noexcept;
 
-    std::vector<uint> getHistogram(uint index);
+    std::vector<std::uint32_t> getHistogram(std::uint32_t index) const;
 
   private:
     RawData &rawData;

@@ -39,7 +39,6 @@ RawData::RawData(const std::string &filename)
 
 RawData::~RawData()
 {
-    // No need to manually free memory - vectors handle cleanup automatically
     if (data_file_.is_open()) {
         data_file_.close();
     }
@@ -51,11 +50,12 @@ RawData::~RawData()
  */
 void RawData::calculateDSandFS()
 {
-    uint data_size_buffer = 0;
-    uint features_size_buffer = 0;
+    std::uint32_t data_size_buffer = 0;
+    std::uint32_t features_size_buffer = 0;
 
-    if (!data_file_.read(reinterpret_cast<char *>(&data_size_buffer), sizeof(uint))
-        || !data_file_.read(reinterpret_cast<char *>(&features_size_buffer), sizeof(uint))) {
+    if (!data_file_.read(reinterpret_cast<char *>(&data_size_buffer), sizeof(std::uint32_t))
+        || !data_file_.read(reinterpret_cast<char *>(&features_size_buffer),
+                            sizeof(std::uint32_t))) {
         throw std::runtime_error("Failed to read data dimensions from file");
     }
 
@@ -65,7 +65,7 @@ void RawData::calculateDSandFS()
 
 void RawData::loadData()
 {
-    t_data buffer;
+    std::uint8_t buffer;
 
     // Preallocate with the right size
     data_.resize(features_size_ * data_size_);
@@ -73,9 +73,9 @@ void RawData::loadData()
     // Seek to position after header (8 bytes)
     data_file_.seekg(8);
 
-    for (uint i = 0; i < data_size_; i++) {
-        for (uint j = 0; j < features_size_; j++) {
-            if (!data_file_.read(reinterpret_cast<char *>(&buffer), sizeof(t_data))) {
+    for (std::uint32_t i = 0; i < data_size_; i++) {
+        for (std::uint32_t j = 0; j < features_size_; j++) {
+            if (!data_file_.read(reinterpret_cast<char *>(&buffer), sizeof(std::uint8_t))) {
                 throw std::runtime_error("Failed to read data_ from file");
             }
             data_[j * data_size_ + i] = buffer;
@@ -90,10 +90,10 @@ void RawData::calculateVR()
 {
     values_range_.resize(features_size_, 0);
 
-    for (uint i = 0; i < features_size_; i++) {
-        uint vr = 0;
-        for (uint j = 0; j < data_size_; j++) {
-            t_data dataRead = data_[i * data_size_ + j];
+    for (std::uint32_t i = 0; i < features_size_; i++) {
+        std::uint32_t vr = 0;
+        for (std::uint32_t j = 0; j < data_size_; j++) {
+            std::uint8_t dataRead = data_[i * data_size_ + j];
             if (dataRead > vr) {
                 vr++;
             }
@@ -102,12 +102,12 @@ void RawData::calculateVR()
     }
 }
 
-uint RawData::getDataSize() const
+std::uint32_t RawData::getDataSize() const
 {
     return data_size_;
 }
 
-uint RawData::getFeaturesSize() const
+std::uint32_t RawData::getFeaturesSize() const
 {
     return features_size_;
 }
@@ -115,7 +115,7 @@ uint RawData::getFeaturesSize() const
 /**
  * Returns how many values a feature has, FROM 1 to VALUES
  */
-uint RawData::getValuesRange(uint index) const
+std::uint32_t RawData::getValuesRange(std::uint32_t index) const
 {
     if (index >= values_range_.size()) {
         throw std::out_of_range("Feature index out of range");
@@ -126,23 +126,24 @@ uint RawData::getValuesRange(uint index) const
 /**
  * Returns a vector with the number of possible values for each feature.
  */
-std::vector<uint> RawData::getValuesRangeArray() const
+const std::vector<std::uint32_t> &RawData::getValuesRangeArray() const
 {
-    return values_range_;  // Return a copy of the vector
+    return values_range_;
 }
 
 /**
  * Returns a vector containing a feature.
  */
-std::vector<t_data> RawData::getFeature(int index) const
+std::vector<std::uint8_t> RawData::fetchFeature(std::uint32_t index) const
 {
-    if (index < 0 || static_cast<uint>(index) >= features_size_) {
+    if (index >= features_size_) {
         throw std::out_of_range("Feature index out of range");
     }
 
-    std::vector<t_data> feature(data_size_);
-    for (uint i = 0; i < data_size_; ++i) {
+    std::vector<std::uint8_t> feature(data_size_);
+    for (std::uint32_t i = 0; i < data_size_; ++i) {
         feature[i] = data_[index * data_size_ + i];
     }
+
     return feature;
 }

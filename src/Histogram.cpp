@@ -17,20 +17,20 @@
 
 #include "Histogram.h"
 
-Histogram::Histogram(RawData &rd)
+Histogram::Histogram(RawData &rd) noexcept
     : rawData(rd)
 {
 }
 
 // Calculates the histogram for the given feature index.
-std::vector<uint> Histogram::getHistogram(uint index)
+std::vector<std::uint32_t> Histogram::getHistogram(std::uint32_t index) const
 {
-    uint valueRange = rawData.getValuesRange(index);
-    std::vector<t_data> featureData = rawData.getFeature(index);
-    std::vector<uint> histogram(valueRange, 0);
+    std::uint32_t valueRange = rawData.getValuesRange(index);
+    std::vector<std::uint8_t> featureData = rawData.fetchFeature(index);
+    std::vector<std::uint32_t> histogram(valueRange, 0);
 
     // Calculate histogram
-    for (uint i = 0; i < rawData.getDataSize(); i++) {
+    for (std::uint32_t i = 0; i < rawData.getDataSize(); i++) {
         if (i < featureData.size() && featureData[i] < valueRange) {
             histogram[featureData[i]]++;
         }
