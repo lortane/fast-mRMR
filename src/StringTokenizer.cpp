@@ -123,13 +123,13 @@ std::string StringTokenizer::remainingString()
     return token_str;
 }
 
-std::string StringTokenizer::filterNextToken(const std::string& filterStr)
+std::string StringTokenizer::filterNextToken(const std::string& filter_string)
 {
     std::string tmp_str = nextToken();
     unsigned int currentPos = 0;
 
-    while ((currentPos = tmp_str.find(filterStr, currentPos)) <= token_str.length()) {
-        tmp_str.erase(currentPos, filterStr.length());
+    while ((currentPos = tmp_str.find(filter_string, currentPos)) <= token_str.length()) {
+        tmp_str.erase(currentPos, filter_string.length());
     }
 
     return tmp_str;

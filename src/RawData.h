@@ -41,9 +41,9 @@ class RawData
     void calculateDSandFS();
     void loadData();
 
-    std::vector<t_data> data;
-    uint featuresSize;
-    uint datasize;
-    std::vector<uint> valuesRange;
-    std::ifstream dataFile;
+    std::vector<t_data> data_;
+    uint features_size_;
+    uint data_size_;
+    std::vector<uint> values_range_;
+    std::ifstream data_file_;
 };

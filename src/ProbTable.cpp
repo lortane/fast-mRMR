@@ -22,14 +22,14 @@
 #include "Histogram.h"
 
 ProbTable::ProbTable(RawData& rd)
-    : rawData(rd)
+    : raw_data(rd)
 {
-    this->datasize = rawData.getDataSize();
-    this->featuresSize = rawData.getFeaturesSize();
-    this->valuesRange = rawData.getValuesRangeArray();
+    data_size_ = raw_data.getDataSize();
+    features_size_ = raw_data.getFeaturesSize();
+    values_range_ = raw_data.getValuesRangeArray();
 
     // Initialize table with the right dimensions
-    table.resize(featuresSize);
+    table.resize(features_size_);
 
     // Calculate probabilities immediately
     calculate();
@@ -39,18 +39,18 @@ ProbTable::ProbTable(RawData& rd)
 // This table is cached in memory to avoid repeating calculations.
 void ProbTable::calculate()
 {
-    Histogram histogram(rawData);
+    Histogram histogram(raw_data);
 
-    for (uint i = 0; i < featuresSize; ++i) {
+    for (uint i = 0; i < features_size_; ++i) {
         // Get histogram for this feature
         std::vector<uint> hist_data = histogram.getHistogram(i);
 
         // Resize the inner vector for this feature
-        table[i].resize(valuesRange[i]);
+        table[i].resize(values_range_[i]);
 
         // Calculate and store probabilities
-        for (uint j = 0; j < valuesRange[i]; ++j) {
-            table[i][j] = static_cast<t_prob>(hist_data[j]) / static_cast<t_prob>(datasize);
+        for (uint j = 0; j < values_range_[i]; ++j) {
+            table[i][j] = static_cast<t_prob>(hist_data[j]) / static_cast<t_prob>(data_size_);
         }
     }
 }

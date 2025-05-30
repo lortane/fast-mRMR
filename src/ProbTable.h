@@ -32,11 +32,11 @@ class ProbTable
     t_prob getProbability(uint feature, t_data value);
 
   private:
-    RawData& rawData;
+    RawData& raw_data;
 
     std::vector<std::vector<t_prob>> table;
 
-    std::vector<uint> valuesRange;
-    uint featuresSize;
-    uint datasize;
+    std::vector<uint> values_range_;
+    uint features_size_;
+    uint data_size_;
 };

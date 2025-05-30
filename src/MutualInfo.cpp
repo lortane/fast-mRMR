@@ -22,27 +22,27 @@
 #include "JointProb.h"
 
 MutualInfo::MutualInfo(RawData &rd, ProbTable &pt)
-    : rawData(rd),
-      probTable(pt)
+    : raw_data_(rd),
+      prob_table_(pt)
 {
 }
 
 // Calculates the mutual information between the given features.
-double MutualInfo::get(uint featureIndex1, uint featureIndex2)
+double MutualInfo::get(uint feature_index1, uint feature_index2)
 {
-    uint range1 = rawData.getValuesRange(featureIndex1);
-    uint range2 = rawData.getValuesRange(featureIndex2);
+    uint range1 = raw_data_.getValuesRange(feature_index1);
+    uint range2 = raw_data_.getValuesRange(feature_index2);
     t_prob mInfo = 0;
 
-    JointProb jointProbTable = JointProb(rawData, featureIndex1, featureIndex2);
+    JointProb jointProbTable = JointProb(raw_data_, feature_index1, feature_index2);
 
     for (uint i = 0; i < range1; i++) {
         for (uint j = 0; j < range2; j++) {
             t_prob jointProb = jointProbTable.getProb(i, j);
 
             if (jointProb > 0) {  // Avoid log(0) which is undefined
-                t_prob marginalX = probTable.getProbability(featureIndex1, i);
-                t_prob marginalY = probTable.getProbability(featureIndex2, j);
+                t_prob marginalX = prob_table_.getProbability(feature_index1, i);
+                t_prob marginalY = prob_table_.getProbability(feature_index2, j);
 
                 // Check for zero probabilities to avoid division by zero
                 if (marginalX > 0 && marginalY > 0) {

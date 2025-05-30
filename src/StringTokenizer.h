@@ -25,7 +25,6 @@ class StringTokenizer
 {
   public:
     StringTokenizer(const std::string& _str, const std::string& _delim);
-    ~StringTokenizer() {};
 
     int countTokens();
     bool hasMoreTokens();

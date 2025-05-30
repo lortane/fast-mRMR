@@ -30,11 +30,11 @@ class JointProb
     t_prob getProb(t_data valueFeature1, t_data valueFeature2);
 
   private:
-    RawData &rawData;
-    std::vector<uint> data;
-    uint datasize;
-    uint valuesRange1;
-    uint valuesRange2;
-    uint index1;
-    uint index2;
+    RawData &raw_data_;
+    std::vector<uint> data_;
+    uint data_size_;
+    uint values_range1_;
+    uint values_range2_;
+    uint index1_;
+    uint index2_;
 };

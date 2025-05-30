@@ -19,17 +19,16 @@
 
 #include <stdexcept>
 
-
 /**
  * Constructor that creates a rawData object.
  *
- * @param filename Path to the data file
+ * @param filename Path to the data_ file
  */
 RawData::RawData(const std::string &filename)
 {
     // Open file with binary mode
-    dataFile.open(filename, std::ios::binary);
-    if (!dataFile) {
+    data_file_.open(filename, std::ios::binary);
+    if (!data_file_) {
         throw std::runtime_error("Could not open file: " + filename);
     }
 
@@ -41,8 +40,8 @@ RawData::RawData(const std::string &filename)
 RawData::~RawData()
 {
     // No need to manually free memory - vectors handle cleanup automatically
-    if (dataFile.is_open()) {
-        dataFile.close();
+    if (data_file_.is_open()) {
+        data_file_.close();
     }
 }
 
@@ -52,16 +51,16 @@ RawData::~RawData()
  */
 void RawData::calculateDSandFS()
 {
-    uint datasizeBuffer = 0;
-    uint featuresSizeBuffer = 0;
+    uint data_size_buffer = 0;
+    uint features_size_buffer = 0;
 
-    if (!dataFile.read(reinterpret_cast<char *>(&datasizeBuffer), sizeof(uint))
-        || !dataFile.read(reinterpret_cast<char *>(&featuresSizeBuffer), sizeof(uint))) {
+    if (!data_file_.read(reinterpret_cast<char *>(&data_size_buffer), sizeof(uint))
+        || !data_file_.read(reinterpret_cast<char *>(&features_size_buffer), sizeof(uint))) {
         throw std::runtime_error("Failed to read data dimensions from file");
     }
 
-    datasize = datasizeBuffer;
-    featuresSize = featuresSizeBuffer;
+    data_size_ = data_size_buffer;
+    features_size_ = features_size_buffer;
 }
 
 void RawData::loadData()
@@ -69,17 +68,17 @@ void RawData::loadData()
     t_data buffer;
 
     // Preallocate with the right size
-    data.resize(featuresSize * datasize);
+    data_.resize(features_size_ * data_size_);
 
     // Seek to position after header (8 bytes)
-    dataFile.seekg(8);
+    data_file_.seekg(8);
 
-    for (uint i = 0; i < datasize; i++) {
-        for (uint j = 0; j < featuresSize; j++) {
-            if (!dataFile.read(reinterpret_cast<char *>(&buffer), sizeof(t_data))) {
-                throw std::runtime_error("Failed to read data from file");
+    for (uint i = 0; i < data_size_; i++) {
+        for (uint j = 0; j < features_size_; j++) {
+            if (!data_file_.read(reinterpret_cast<char *>(&buffer), sizeof(t_data))) {
+                throw std::runtime_error("Failed to read data_ from file");
             }
-            data[j * datasize + i] = buffer;
+            data_[j * data_size_ + i] = buffer;
         }
     }
 }
@@ -89,28 +88,28 @@ void RawData::loadData()
  */
 void RawData::calculateVR()
 {
-    valuesRange.resize(featuresSize, 0);
+    values_range_.resize(features_size_, 0);
 
-    for (uint i = 0; i < featuresSize; i++) {
+    for (uint i = 0; i < features_size_; i++) {
         uint vr = 0;
-        for (uint j = 0; j < datasize; j++) {
-            t_data dataRead = data[i * datasize + j];
+        for (uint j = 0; j < data_size_; j++) {
+            t_data dataRead = data_[i * data_size_ + j];
             if (dataRead > vr) {
                 vr++;
             }
         }
-        valuesRange[i] = vr + 1;
+        values_range_[i] = vr + 1;
     }
 }
 
 uint RawData::getDataSize() const
 {
-    return datasize;
+    return data_size_;
 }
 
 uint RawData::getFeaturesSize() const
 {
-    return featuresSize;
+    return features_size_;
 }
 
 /**
@@ -118,10 +117,10 @@ uint RawData::getFeaturesSize() const
  */
 uint RawData::getValuesRange(uint index) const
 {
-    if (index >= valuesRange.size()) {
+    if (index >= values_range_.size()) {
         throw std::out_of_range("Feature index out of range");
     }
-    return valuesRange[index];
+    return values_range_[index];
 }
 
 /**
@@ -129,7 +128,7 @@ uint RawData::getValuesRange(uint index) const
  */
 std::vector<uint> RawData::getValuesRangeArray() const
 {
-    return valuesRange;  // Return a copy of the vector
+    return values_range_;  // Return a copy of the vector
 }
 
 /**
@@ -137,13 +136,13 @@ std::vector<uint> RawData::getValuesRangeArray() const
  */
 std::vector<t_data> RawData::getFeature(int index) const
 {
-    if (index < 0 || static_cast<uint>(index) >= featuresSize) {
+    if (index < 0 || static_cast<uint>(index) >= features_size_) {
         throw std::out_of_range("Feature index out of range");
     }
 
-    std::vector<t_data> feature(datasize);
-    for (uint i = 0; i < datasize; ++i) {
-        feature[i] = data[index * datasize + i];
+    std::vector<t_data> feature(data_size_);
+    for (uint i = 0; i < data_size_; ++i) {
+        feature[i] = data_[index * data_size_ + i];
     }
     return feature;
 }

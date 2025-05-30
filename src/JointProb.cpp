@@ -19,18 +19,17 @@
 
 #include <stdexcept>
 
-
-JointProb::JointProb(RawData &rd, uint index1, uint index2)
-    : rawData(rd)
+JointProb::JointProb(RawData &raw_data, uint index1, uint index2)
+    : raw_data_(raw_data)
 {
-    this->index1 = index1;
-    this->index2 = index2;
-    this->valuesRange1 = rawData.getValuesRange(index1);
-    this->valuesRange2 = rawData.getValuesRange(index2);
-    this->datasize = rawData.getDataSize();
+    index1_ = index1;
+    index2_ = index2;
+    values_range1_ = raw_data_.getValuesRange(index1);
+    values_range2_ = raw_data_.getValuesRange(index2);
+    data_size_ = raw_data_.getDataSize();
 
     // Initialize vector with zeros (equivalent to calloc)
-    this->data.resize(valuesRange1 * valuesRange2, 0);
+    data_.resize(values_range1_ * values_range2_, 0);
 
     calculate();
 }
@@ -39,29 +38,29 @@ JointProb::JointProb(RawData &rd, uint index1, uint index2)
 void JointProb::calculate()
 {
     // Get feature vectors - these are now std::vector<t_data>, not raw pointers
-    std::vector<t_data> h_vector1 = rawData.getFeature(index1);
-    std::vector<t_data> h_vector2 = rawData.getFeature(index2);
+    std::vector<t_data> h_vector1 = raw_data_.getFeature(index1_);
+    std::vector<t_data> h_vector2 = raw_data_.getFeature(index2_);
 
     // Calculate histogram in CPU
-    for (uint i = 0; i < datasize; i++) {
+    for (uint i = 0; i < data_size_; i++) {
         // Access vectors with bounds checking
         if (i < h_vector1.size() && i < h_vector2.size()) {
-            uint index = h_vector1[i] * valuesRange2 + h_vector2[i];
-            if (index < data.size()) {
-                data[index]++;
+            uint index = h_vector1[i] * values_range2_ + h_vector2[i];
+            if (index < data_.size()) {
+                data_[index]++;
             }
         }
     }
 }
 
-t_prob JointProb::getProb(t_data valueFeature1, t_data valueFeature2)
+t_prob JointProb::getProb(t_data value_feature1, t_data value_feature2)
 {
-    uint index = valueFeature1 * valuesRange2 + valueFeature2;
+    uint index = value_feature1 * values_range2_ + value_feature2;
 
     // Add bounds checking for safety
-    if (index >= data.size()) {
+    if (index >= data_.size()) {
         throw std::out_of_range("Index out of range in JointProb::getProb");
     }
 
-    return static_cast<t_prob>(data[index]) / static_cast<t_prob>(datasize);
+    return static_cast<t_prob>(data_[index]) / static_cast<t_prob>(data_size_);
 }

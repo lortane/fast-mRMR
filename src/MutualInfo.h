@@ -27,6 +27,6 @@ class MutualInfo
     t_prob get(uint index1, uint index2);
 
   private:
-    RawData &rawData;
-    ProbTable probTable;
+    RawData &raw_data_;
+    ProbTable prob_table_;
 };

@@ -29,7 +29,6 @@
 #include "RawData.h"
 #include "utils.h"
 
-
 // Returns the index of the higher value in the classRelevances Vector different
 // from classIndex
 uint getMaxRelevance(std::vector<double> classRelevances, uint classIndex)
@@ -86,7 +85,7 @@ int main(int argc, char *argv[])
     uint newFeatureIndex = 0;
     uint lastFeatureIndex = 0;
     double mrmr = 0;
-    double acum = 0;
+    double best_score = 0;
     std::vector<double> relevances;
     std::vector<double> redundances;
     std::vector<int> selectedFeatures;
@@ -114,15 +113,15 @@ int main(int argc, char *argv[])
     // MRMR
     while (selectedFeatures.size() < rawData.getFeaturesSize() - 1  //-1 because class is discarded
            and selectedFeatures.size() < opts.selectedFeatures) {
-        acum = -std::numeric_limits<double>::infinity();
+        best_score = -std::numeric_limits<double>::infinity();
         for (j = 0; j < rawData.getFeaturesSize(); ++j) {
             // If feature not in selected selectedFeatures
             if (find(selectedFeatures.begin(), selectedFeatures.end(), j) == selectedFeatures.end()
                 && j != opts.classIndex) {
                 redundances[j] += mutualInfo.get(lastFeatureIndex, j);
                 mrmr = relevances[j] - (redundances[j] / selectedFeatures.size());
-                if (mrmr > acum) {
-                    acum = mrmr;
+                if (mrmr > best_score) {
+                    best_score = mrmr;
                     newFeatureIndex = j;
                 }
             }
